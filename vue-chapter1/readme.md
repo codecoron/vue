@@ -207,6 +207,165 @@ updated |
 <span v-once>这个将不会改变: {{ msg }}</span>
 ```
 
+
+
+#### vbind和v-on缩写
+
+原来还有缩写
+
+``v-bind``简写成  ``:``
+
+```html
+<!-- 完整语法 -->
+<a v-bind:href="url">...</a>
+
+<!-- 缩写 -->
+<a :href="url">...</a>
+
+<!-- 动态参数的缩写 (2.6.0+) -->
+<a :[key]="url"> ... </a>
+```
+
+
+
+``v-on``简写成``@``
+
+```html
+
+<!-- 完整语法 -->
+<a v-on:click="doSomething">...</a>
+
+<!-- 缩写 -->
+<a @click="doSomething">...</a>
+
+<!-- 动态参数的缩写 (2.6.0+) -->
+<a @[event]="doSomething"> ... </a>
+
+```
+
+
+
+## Class与Style绑定
+
+> `v-bind` 用于 `class` 和 `style` 时，Vue.js 做了专门的增强。
+>
+> [Vue.js官网对Class与Style绑定的讲解](https://cn.vuejs.org/v2/guide/class-and-style.html)
+
+
+
+### v-bind与Class
+
+#### 对象语法
+
+当`isActive ` 为真时，`active` 样式生效。(外表看起来像Key-Value，但又不完全是Key-Value)
+
+**注意**
+
+这里不能少了**花括号** 
+
+```html
+<div v-bind:class="{ active: isActive }"></div>
+```
+
+```js
+data: {
+  isActive: true,
+  hasError: false
+}
+```
+
+
+
+#### 数组语法
+
+> 个人感觉数组语法，并没有对象语法来得灵活。但是可以同时应用几个JS对象，可能是不同层面上的灵活，一个是对一个JS对象不同样式的灵活，一个是对不同JS对象的灵活。
+
+```html
+<div v-bind:class="[activeClass, errorClass]"></div>
+```
+
+```js
+data: {
+  activeClass: 'active',
+  errorClass: 'text-danger'
+}
+```
+
+
+
+### v-bind与Style
+
+#### 对象语法
+
+这里不像与Class绑定，根据true或者false去选择Style了。**而是直接用起了Style中的各种属性。** Key-Value，左边是**属性名**，右边是**属性值**。
+
+
+
+注意：这里不能少了**花括号** 
+
+```html
+<div v-bind:style="{ color: activeColor, fontSize: fontSize + 'px' }"></div>
+```
+
+```js
+data: {
+  activeColor: 'red',
+  fontSize: 30
+}
+```
+
+
+
+
+
+**其实花括号里面就是一个JS对象** ，所以还可以这么写。
+
+```html
+<div v-bind:style="styleObject"></div>
+```
+
+```js
+data: {
+  styleObject: {
+    color: 'red',
+    fontSize: '13px'
+  }
+}
+```
+
+
+
+还没有搞清楚的是，单引号和双引号应该如何使用。感觉是交叉使用。
+
+1. Style后面跟双引号
+2. 正常的Style后面的Key-Value都是不用引号
+
+
+
+#### 数组语法
+
+> 应该主要是为了可以同时应用几个js对象
+
+```html
+<div v-bind:style="[baseStyles, overridingStyles]"></div>
+```
+
+```js
+data: {
+  baseStyles: {
+    color: 'red',
+    fontSize: '13px'
+  },
+   overridingStyles:{
+       color:'black'
+   }
+}
+```
+
+
+
+
+
 # 这就是Vue.js吗
 
 ### 创建一个Vue对象
