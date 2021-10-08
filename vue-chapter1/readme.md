@@ -362,7 +362,158 @@ data: {
 }
 ```
 
+---
 
+## 计算属性和侦听器
+> [Vue.js官网对计算属性的描述](https://cn.vuejs.org/v2/guide/computed.html
+
+
+
+### 计算属性
+
+#### 基本语法
+
+就是Vue的``Computed``属性，``Computed``属性里面再加上 key-value，Vaule可以换成一个方法。
+
+```htm
+<div id="example">
+  <p>Original message: "{{ message }}"</p>
+  <p>Computed reversed message: "{{ reversedMessage }}"</p>
+</div>
+```
+
+
+
+```js
+var vm = new Vue({
+  el: '#example',
+  data: {
+    message: 'Hello'
+  },
+  computed: {
+    // 计算属性的 getter
+    reversedMessage: function () {
+      // `this` 指向 vm 实例
+      return this.message.split('').reverse().join('')
+    }
+  }
+})
+```
+
+
+
+#### 计算属性缓存VS方法
+
+我们发现不使用``Computed``属性，换成methods也可以达到同样的效果。
+
+
+
+```js
+methods: {
+  reversedMessage: function () {
+    return this.message.split('').reverse().join('')
+  }
+}
+```
+
+
+
+计算属性会进行一个缓存，**只要相关的依赖**没有发生改变就会直接返回缓存。而methods是每次都会执行一遍。
+
+下面这个例子是``Computed``但是并不存在相关依赖，所以``now``这个属性永远不会发生改变.
+
+```js
+computed: {
+  now: function () {
+    return Date.now()
+  }
+}
+```
+
+
+
+#### 计算属性与侦听属性
+
+计算属性在有依赖时,自带侦听功能,而不需要手动Watch
+
+
+
+```html
+<div id="demo">{{ fullName }}</div>
+```
+
+
+
+使用Watch
+
+```js
+var vm = new Vue({
+  el: '#demo',
+  data: {
+    firstName: 'Foo',
+    lastName: 'Bar',
+    fullName: 'Foo Bar'
+  },
+  watch: {
+    firstName: function (val) {
+      this.fullName = val + ' ' + this.lastName
+    },
+    lastName: function (val) {
+      this.fullName = this.firstName + ' ' + val
+    }
+  }
+})
+```
+
+
+
+使用Computed依赖自动侦听
+
+```js
+var vm = new Vue({
+  el: '#demo',
+  data: {
+    firstName: 'Foo',
+    lastName: 'Bar'
+  },
+  computed: {
+    fullName: function () {
+      return this.firstName + ' ' + this.lastName
+    }
+  }
+})
+```
+
+
+
+#### 计算属性的Setter
+
+计算属性默认只有 getter，不过在需要时你也可以提供一个 setter(更加细分的写法出现了)
+
+目前我觉得,有了setter,``Computed``属性可以被随意改变了,我也不知道是好是坏.
+
+```js
+computed: {
+  fullName: {
+    // getter
+    get: function () {
+      return this.firstName + ' ' + this.lastName
+    },
+    // setter
+    set: function (newValue) {
+      var names = newValue.split(' ')
+      this.firstName = names[0]
+      this.lastName = names[names.length - 1]
+    }
+  }
+}
+```
+
+
+
+### 侦听器
+
+> 待
 
 
 
@@ -373,7 +524,9 @@ data: {
 创建一个Vue对象是通过一个Json对象来创造，并且这个Json可以有很多属性，你可以添加，也可以不添加。
 
 Key | 作用
------|----|
-el   | 
+-----|----
+el   |
 data |
 methods|
+computed|
+
