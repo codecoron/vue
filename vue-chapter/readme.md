@@ -516,6 +516,59 @@ computed: {
 > 待
 
 
+## 条件渲染
+
+### `v-if` 和 `v-if-else` 和 `v-else`
+
+`v-if` 用于条件性地渲染一块内容(一个元素，当然元素也可以嵌套元素)，只有在指令表达式返回truthy时，内容才会被渲染。
+
+```js
+<h1 v-if="awesome">Vue is awesome!</h1>
+```
+
+**`v-if` 与`v-else` 联合** 
+
+```js
+<h1 v-if="awesome">Vue is awesome!</h1>
+<h1 v-else>Oh no 😢</h1>
+```
+
+注意：这两个元素必须连在一起才能被解释为一个 if-else 结构。可以看出这是脚本语言地一大特点。
+
+**还有`v-if-else``**
+这样就成了真正地if-else-if结构
+
+```js
+<div v-if="type === 'A'">
+  A
+</div>
+<div v-else-if="type === 'B'">
+  B
+</div>
+<div v-else-if="type === 'C'">
+  C
+</div>
+<div v-else>
+  Not A/B/C
+</div>
+```
+
+注意:v-之后后面双引号括起来的是表达式，js表达式，可以代表着变量，运算式。可以注意到，双引号内嵌套单引号来表达字符串。
+
+### `v-show`
+**表面上** 跟`v-if`的作用类似。
+
+```html
+<h1 v-show="ok">Hello!</h1>
+```
+
+不同的是带有 v-show 的元素始终会被渲染并保留在 DOM 中。v-show 只是简单地切换元素的 CSS property display。
+
+就是`v-if`中如果为false，元素是不会存在于源代码中了，也即从DOM树中剔除。但是`v-show`只是通过设置`display:none`把元素隐藏起来，其实元素还是在源代码中，还在DOM树中。
+
+`v-if`像是真正的条件渲染，`v-show`其实是一直都会渲染(加载到DOM树上)，只是通过css隐藏起来。
+
+
 
 # 这就是Vue.js吗
 
