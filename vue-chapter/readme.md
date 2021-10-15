@@ -60,6 +60,14 @@ var app2 = new Vue({
 })
 ```
 
+
+
+注意`v-bind`也可以绑定**自定义属性**
+
+这里的应用主要在于`v-for`的应用。
+
+
+
 #### v-if
 
 ```html
@@ -567,6 +575,204 @@ computed: {
 就是`v-if`中如果为false，元素是不会存在于源代码中了，也即从DOM树中剔除。但是`v-show`只是通过设置`display:none`把元素隐藏起来，其实元素还是在源代码中，还在DOM树中。
 
 `v-if`像是真正的条件渲染，`v-show`其实是一直都会渲染(加载到DOM树上)，只是通过css隐藏起来。
+
+
+
+## 列表渲染
+
+### `v-for` 与数组
+
+同样这些，这些语法也符合脚本语言的简洁。`item`遍历数组时的值，`index`是遍历数组时的下标。**而且它们两个的顺序是固定的**，第一个参数是值，第二个参数是index(想一想有没有可能直接取下标而不取值)
+
+```html
+<ul>
+    <li v-for="item ,index in items">
+        {{item.message}},{{index}}
+    </li>
+</ul>
+```
+
+```js
+var vm = new Vue({
+    el:"#app",
+    data:{
+        items:[
+            {message:"Foo"},
+            {message:"Bar"}
+        ]
+    }
+})
+```
+
+
+
+### `v-for` 与对象
+
+基本的，同样可以对一个对象内的元素进行遍历。此外，还可以获取对应元素的key。
+
+```html
+<li v-for="value , key in object">
+    {{value}},{{key}}
+</li>
+```
+
+
+
+```js
+var vm = new Vue({
+    el:"#app",
+    data:{
+        object:{
+            title:"How to do list in Vue",
+            author:"coderon",
+            publishAt:"2021-10-13"
+        }
+    }
+})
+```
+
+
+
+还可以用第三个参数哦 `index`
+
+```html
+<div v-for="(value, name, index) in object">
+  {{ index }}. {{ name }}: {{ value }}
+</div>
+```
+
+
+
+### 维护状态
+
+有没有考虑过，当你使用`v-for`后，也就是对象被渲染成了一些DOM节点。那如果，对象发生了变化呢？DOM节点应该如何发生变化？
+
+Vue默认是，如果对象的顺序发生了变化，那就直接DOM节点的内容转换一下，而不是转换DOM节点的顺序。**那如果你想重新排序每个DOM节点呢？** 就应该给节点加上一个key。
+
+```html
+<div v-for="item in items" v-bind:key="item.id">
+  <!-- 内容 -->
+</div>
+```
+
+
+
+### 数组更新检测
+
+#### 变更方法
+
+> 当你想对数组进行处理的时候，Vue方便快捷的函数
+
+- `push()`
+- `pop()`
+- `shift()`  //左移
+- `unshift()` //右移
+- `splice()`  //拼接删除等处理
+- `sort()`
+- `reverse()`
+
+
+
+### 显示过滤/排序后的结果
+
+有时，我们想要显示一个数组经过过滤或排序后的版本，而不实际变更或重置原始数据。在这种情况下，可以创建一个计算属性，来返回过滤或排序后的数组。
+
+例如：
+
+```html
+<li v-for="n in evenNumbers">{{ n }}</li>
+```
+
+```js
+data: {
+  numbers: [ 1, 2, 3, 4, 5 ]
+},
+computed: {
+  evenNumbers: function () {
+    return this.numbers.filter(function (number) {
+      return number % 2 === 0
+    })
+  }
+}
+```
+
+
+
+这里说一下 `filter`的原型。可以参考一下这里[filter](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Array/filter) 
+
+```js
+var newArray = arr.filter(callback(element[, index[, array]])[, thisArg])
+```
+
+主要需要注意的是，传入一个函数，函数里面传入一个数组，然后对数组每一个元素执行函数，如果返回值为真，则用这个元素来创建新数组。
+
+
+
+**如果不用计算属性，还可以用methods** 
+
+```html
+<ul v-for="set in sets">
+  <li v-for="n in even(set)">{{ n }}</li>
+</ul>
+```
+
+```js
+data: {
+  sets: [[ 1, 2, 3, 4, 5 ], [6, 7, 8, 9, 10]]
+},
+methods: {
+  even: function (numbers) {
+    return numbers.filter(function (number) {
+      return number % 2 === 0
+    })
+  }
+}
+```
+
+
+
+### `v-for` 使用里值范围
+
+`v-for`还可以这么写
+
+```js
+<div>
+  <span v-for="n in 10">{{ n }} </span>
+</div>
+```
+
+结果:
+
+```html
+1 2 3 4 5 6 7 8 9 10
+```
+
+
+
+### `v-for`与template使用
+
+> 反正就是起到一个，模板化的作用
+
+比如
+
+```html
+<ul>
+  <template v-for="item in items">
+    <li>{{ item.msg }}</li>
+    <li class="divider" role="presentation"></li>
+  </template>
+</ul>
+```
+
+
+
+### `v-for`与`v-if` 
+
+> 官方很不推荐`v-for` 与`v-if`一起使用，具体我也说不清
+
+
+
+
 
 
 
