@@ -768,9 +768,76 @@ methods: {
 
 ### `v-for`与`v-if` 
 
-> 官方很不推荐`v-for` 与`v-if`一起使用，具体我也说不清
+> 官方很**不推荐**`v-for` 与`v-if`一起使用，具体我也说不清。主要考虑到性能问题，如果你硬是要用`v-for`和`v-if`，可以通过下面的例子来优化。
+
+**永远不要把 `v-if` 和 `v-for` 同时用在同一个元素上。** 
+
+[官方对于`v-for`和`v-if`的描述](https://cn.vuejs.org/v2/style-guide/#避免-v-if-和-v-for-用在一起必要)
 
 
+
+- 为了过滤一个列表中的项目 (比如 `v-for="user in users" v-if="user.isActive"`)。在这种情形下，请将 `users` 替换为一个计算属性 (比如 `activeUsers`)，让其返回过滤后的列表。
+- 为了避免渲染本应该被隐藏的列表 (比如 `v-for="user in users" v-if="shouldShowUsers"`)。这种情形下，请将 `v-if` 移动至容器元素上 (比如 `ul`、`ol`)。
+
+
+
+#### 例子一
+
+**修改前**
+
+> 本质上，**每一次** 刷新网页都会遍历所有元素
+
+```html
+<ul>
+    <li v-for="user in users" v-if="user.isActive">
+        {{user.id}}:{{user.name}}		
+    </li>
+</ul>
+```
+
+
+
+```js
+data:{
+    users:[
+        {id:1,name:'coderon',isActive:true},
+        {id:2,name:'jinlong',isActive:false}
+    ]
+}
+```
+
+
+
+**修改后**
+
+> 使用computed 缓存下来需要展示的元素，并且如果users数组没有发生变化，便不会去遍历数组。这样就解决了，之前每次刷新都要遍历数组的问题。
+
+```html
+<ul>
+  <li
+    v-for="user in activeUsers"
+    :key="user.id"
+  >
+    {{ user.name }}
+  </li>
+</ul>
+```
+
+```js
+computed: {
+  activeUsers: function () {
+    return this.users.filter(function (user) {
+      return user.isActive
+    })
+  }
+}
+```
+
+
+
+#### 例子二
+
+> 对官网中，第二个例子不是很理解。因为没有完整的data举例子。
 
 
 

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+		<title></title>
+	</head>
+	<body>
+		
+		<div id="app">
+			<ul>
+				<li v-for="user in users" v-if="user.isActive">
+			{{user.id}}:{{user.name}}		
+				</li>
+			</ul>
+		</div>
+		
+		<script type="text/javascript">
+			var vm = new Vue({
+				el:"#app",
+				data:{
+					users:[
+						{id:1,name:'coderon',isActive:true},
+						{id:2,name:'jinlong',isActive:false}
+					]
+				}
+			})
+		</script>
+		
+	</body>
+</html>
