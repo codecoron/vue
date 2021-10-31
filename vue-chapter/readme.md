@@ -841,6 +841,98 @@ computed: {
 
 
 
+## 事件处理
+
+> 事件主要就是指DOM的一些事件，这里做了关于鼠标点击还有键盘的笔记。(DOM事件还有很多)
+
+
+
+### 监听事件`v-on`
+
+监听事件，就用`v-on`来绑定。后面还可以跟具体的类型，比如点击事件用`v-on:click`，键盘可以用`v-on:keyup`。**这样的统一性就很强。** 
+
+
+
+示例
+
+>  click事件除了可以绑定一些js代码，还可以绑定一些方法。
+
+```html
+<div id='app'>
+    <div id="example-1">
+        <button v-on:click="counter+=1">数值:{{counter}}</button>
+        <button v-on:click="greet('abc',$event)">Greet</button>
+    </div>
+</div>
+```
+
+
+
+```js
+var vm = new Vue({
+    el:'#app',
+    data:{
+        counter:0,
+        name:"Vue"
+    },
+    methods:{
+        greet:function(str,e){
+            alert(str);
+            console.log(e);
+        }
+    }
+})
+```
+
+
+
+### 事件修饰符
+
+在捕获到某种事件之后，我们还希望有更细致的划分，所以就有了事件修饰符。
+
+
+
+- `.stop`
+- `.prevent`
+- `.capture`
+- `.self`
+- `.once`
+- `.passive`
+
+
+
+```js
+<!-- 阻止单击事件继续传播 -->
+<a v-on:click.stop="doThis"></a>
+
+<!-- 提交事件不再重载页面 -->
+<form v-on:submit.prevent="onSubmit"></form>
+
+<!-- 修饰符可以串联 -->
+<a v-on:click.stop.prevent="doThat"></a>
+
+<!-- 只有修饰符 -->
+<form v-on:submit.prevent></form>
+
+<!-- 添加事件监听器时使用事件捕获模式 -->
+<!-- 即内部元素触发的事件先在此处理，然后才交由内部元素进行处理 -->
+<div v-on:click.capture="doThis">...</div>
+
+<!-- 只当在 event.target 是当前元素自身时触发处理函数 -->
+<!-- 即事件不是从内部元素触发的 -->
+<div v-on:click.self="doThat">...</div>
+```
+
+
+
+但是就我个人来说，我对DOM事件处理的需求不多，因此这里只是简单做个笔记，没有深刻了解。
+
+
+
+
+
+
+
 
 
 # 这就是Vue.js吗
