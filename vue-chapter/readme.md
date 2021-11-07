@@ -217,11 +217,18 @@ updated |
 
 
 
-#### vbind和v-on缩写
+#### vbind和v-on简写
 
 原来还有缩写
 
 ``v-bind``简写成  ``:``
+
+```js
+v-bind:[attribute]
+:[attribute]
+```
+
+
 
 ```html
 <!-- 完整语法 -->
@@ -929,7 +936,195 @@ var vm = new Vue({
 
 
 
+## 表单输入绑定
 
+> 主要就是`v-model`的使用
+
+
+
+### 基础用法
+
+`v-model`是用于双向绑定的，html控件的value会和js对象进行绑定。事实上`v-model`只是语法糖，等于`v-bind`加上事件监听，到底是哪种事件，Vue也会自动判断。应用的表单包括`<input>`、`<textarea>` 、`<select>`、`checkbox `和`radio`。
+
+**注意：** 
+
+>  `v-model` 会忽略所有表单元素的 `value`、`checked`、`selected` attribute 的初始值而总是将 Vue 实例的数据作为数据来源。你应该通过 JavaScript 在组件的 `data` 选项中声明初始值。
+
+
+
+#### 文本
+
+```html
+<input v-model="message" placeholder="edit me">
+<p>Message is: {{ message }}</p>
+```
+
+
+
+注意：这时候value属性已经不能像以前一样声明控制了。**(就是这个值在代码里面还是有的，但是不会展现出来)** 
+
+```html
+<input v-model="message" value="initValue" placeholder="edit me">
+//这段代码的value并不会起作用
+```
+
+
+
+#### 多行文本
+
+```html
+<span>Multiline message is:</span>
+<p style="white-space: pre-line;">{{ message }}</p>
+<br>
+<textarea v-model="message" placeholder="add multiple lines"></textarea>
+```
+
+
+
+注意：对于`<textarrea>`下面代码的`{{message}}`也不会起作用了。**(就是这个值在代码里面还是有的，但是不会展现出来)** 
+
+```html
+<textarea v-model="message2">{{message}}</textarea>
+```
+
+
+
+#### 复选框
+
+```html
+<input type="checkbox" id="jack" value="Jack" v-model="checkedNames">
+<label for="jack">Jack</label>
+<input type="checkbox" id="john" value="John" v-model="checkedNames">
+<label for="john">John</label>
+<input type="checkbox" id="mike" value="Mike" v-model="checkedNames">
+<label for="mike">Mike</label>
+<br>
+<span>Checked names: {{ checkedNames }}</span>
+```
+
+```js
+new Vue({
+  el: '...',
+  data: {
+    checkedNames: []
+  }
+})
+```
+
+
+
+对于单选框或者复选框，`<label for=""></label>`我是第一次见，但是可以理解，主要是通过for和input联系起来。
+
+
+
+#### 单选按钮
+
+```html
+<div id="example-4">
+  <input type="radio" id="one" value="One" v-model="picked">
+  <label for="one">One</label>
+  <br>
+  <input type="radio" id="two" value="Two" v-model="picked">
+  <label for="two">Two</label>
+  <br>
+  <span>Picked: {{ picked }}</span>
+</div>
+```
+
+```js
+new Vue({
+  el: '#example-4',
+  data: {
+    picked: ''
+  }
+})
+```
+
+
+
+#### 单选框
+
+```html
+<div id="example-5">
+  <select v-model="selected">
+    <option disabled value="">请选择</option>
+    <option>A</option>
+    <option>B</option>
+    <option>C</option>
+  </select>
+  <span>Selected: {{ selected }}</span>
+</div>
+```
+
+```js
+new Vue({
+  el: '...',
+  data: {
+    selected: ''
+  }
+})
+```
+
+
+
+**option可以编程动态的**
+
+```html
+<select v-model="selected">
+  <option v-for="option in options" v-bind:value="option.value">
+    {{ option.text }}
+  </option>
+</select>
+<span>Selected: {{ selected }}</span>
+```
+
+```js
+new Vue({
+  el: '...',
+  data: {
+    selected: 'A',
+    options: [
+      { text: 'One', value: 'A' },
+      { text: 'Two', value: 'B' },
+      { text: 'Three', value: 'C' }
+    ]
+  }
+})
+```
+
+#### `v-bind` 与 `v-model`区别？
+
+`v-bind`是一种单向绑定，Vue对象发生变化，html的value才会发生变化，而html发生变化，Vue不会变化。
+
+```html
+<input v-bind:value="message" placeholder="edit me" />
+```
+
+
+
+`v-model`则是双向绑定，本质是`v-bind`加上`v-on`
+
+```html
+<div>
+     <input type="text" @input="handleInput" :value="message" />
+     <div>{{message}}</div>
+     
+</div>
+```
+
+```js
+new Vue({
+  el: '...',
+  data: {
+    message: ''
+  },
+  methods:{
+      handleInput(e){
+      	this.message = e.target.value;
+       }
+  }
+})
+```
 
 
 
