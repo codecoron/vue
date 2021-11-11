@@ -1,6 +1,8 @@
 > 基于Vue2.x
 
 > [Vue-api](https://cn.vuejs.org/v2/api/#全局配置)
+>
+> [在线Vue.js文件](https://unpkg.com/vue)
 
 # 起步
 ## Vue实例
@@ -893,6 +895,20 @@ var vm = new Vue({
 
 
 
+**补充**
+
+说真的，绑定事件后跟的一些js代码，真的不是很多。比如下面这样就不行。
+
+```html
+ <button v-on:click="console(count)">数值:{{counter}}</button>
+```
+
+就好像绑定一个Vue对象之后，只能执行一些**加减乘除** ，或者Vue对象methods中的函数，而不能直接执行js的一些库函数。
+
+
+
+
+
 ### 事件修饰符
 
 在捕获到某种事件之后，我们还希望有更细致的划分，所以就有了事件修饰符。
@@ -1128,6 +1144,322 @@ new Vue({
 
 
 
+## 组件基础
+
+
+
+### 基础示例
+
+```js
+// 定义一个名为 button-counter 的新组件
+Vue.component('button-counter', {
+  data: function () {
+    return {
+      count: 0
+    }
+  },
+  template: `<button v-on:click="count++">You clicked me {{ count }} times.</button>`
+})
+```
+
+```html
+<div id="components-demo">
+  <button-counter></button-counter>
+</div>
+```
+
+```js
+new Vue({ el: '#components-demo' })
+```
+
+
+
+**注意点**
+
+1. 如何定义一个组件？(Vue的静态方法，参数有componentName，Vue对象)
+2. template之后接着的是**反引号**
+3. 定义了组件之后，需要把它挂载到某个与Vue绑定的html元素内
+
+
+
+### 组件复用
+
+定义好组件之后，其实就可以直接复用，就是代码一样。但是需要注意，组件的所有数据是不是都是**每次都会新创建**
+
+```html
+<div id="components-demo">
+  <button-counter></button-counter>
+  <button-counter></button-counter>
+  <button-counter></button-counter>
+</div>
+```
+
+
+
+#### 注意data的形式
+
+在创建组件时，数据使用的是函数，而不是直接定义一个对象。可能是Vue设计出组件，就是希望互不影响吧，如果直接给data一个对象，其它组件可能都共享这个data了，所以直接在语法层面就规定了必须使用function且有return。
+
+```js
+  data: function () {
+    return {
+      count: 0
+    }
+```
+
+
+
+这样会报错
+
+```js
+data:{
+    count:0
+}
+//The "data" option should be a function that returns a per-instance value in component definitions
+```
+
+
+
+**如果你想组件共享data，还可以有这种骚操作**
+
+在外面定义一个变量，再返回。
+
+```js
+var buttonCounter2Data2 = {count : 0}
+
+Vue.component('button-counter',{
+    data:function(){
+        return buttonCounter2Data2;
+    }
+    template: `<button @click="$emit('clickhere',count++)">You click me</button>`,
+})
+```
+
+
+
+### 组件的组织
+
+
+
+#### 全局注册
+
+> 像上面例子提到的，就是全局注册
+
+
+
+#### 局部注册
+
+> 还没学到
+
+
+
+### 自定义attribute和Prop
+
+> 示例组件
+
+```js
+Vue.component('blog-post', {
+    props: ['title'],
+    template: '<h3>{{ title }}</h3>'
+})
+```
+
+
+
+
+
+```js
+<div id="app">
+    <blog-post title="My journey with Vue"></blog-post>
+	<blog-post title="Blogging with Vue"></blog-post>
+	<blog-post title="Why Vue is so fun"></blog-post>
+</div>
+```
+
+```js
+new Vue({
+    el:"#app"
+})
+```
+
+
+
+
+
+```html
+<div id="app-2">
+    <blog-post
+               v-for="post in posts"
+               v-bind:key="post.id"
+               v-bind:title="post.title"
+               ></blog-post>
+</div>
+```
+
+```js
+new Vue({
+    el: '#app-2',
+    data: {
+        posts: [
+            { id: 1, title: 'My journey with Vue' },
+            { id: 2, title: 'Blogging with Vue' },
+            { id: 3, title: 'Why Vue is so fun' }
+        ]
+    }
+})
+```
+
+也许，你又忘记了`v-bind:key`的作用。没关系，以后再想。
+
+
+
+### 监听子组件事件
+
+
+
+```html
+<div id="blog-posts-events-demo">
+    <div :style="{ fontSize: postFontSize + 'em' }">
+        <blog-post
+                   v-for="post in posts"
+                   v-bind:key="post.id"
+                   v-bind:post="post"
+                   v-on:enlarge-text="postFontSize += 0.1"
+                   ></blog-post>
+    </div>
+</div>
+```
+
+```js
+Vue.component('blog-post', {
+    props: ['post'],
+    template: `
+        <div>
+        <h3>{{ post.title }}</h3>
+        <button v-on:click='$emit("enlarge-text")'>
+        Enlarge text
+        </button>
+        <div v-html="post.content"></div>
+        </div>
+        `
+})
+
+new Vue({
+    el: '#blog-posts-events-demo',
+    data: {
+        posts: [
+            { id: 1, title: 'My journey with Vue' },
+            { id: 2, title: 'Blogging with Vue' },
+            { id: 3, title: 'Why Vue is so fun' }
+        ],
+        postFontSize: 1
+    }
+})
+```
+
+
+
+#### 在组件上使用`v-model`
+
+想想之前的`v-model`用法，html与Vue变量的双向绑定。
+
+```html
+<input v-model="searchText">
+```
+
+**等价于**
+
+```js
+<input
+  v-bind:value="searchText"
+  v-on:input="searchText = $event.target.value"
+>
+```
+
+
+
+> 示例
+
+```html
+<custom-input v-model="searchText"></custom-input>
+```
+
+```js
+Vue.component('custom-input', {
+  props: ['value'],
+  template: `
+    <input
+      v-bind:value="value"
+      v-on:input="$emit('input', $event.target.value)"
+    >
+  `
+})
+```
+
+**注意写法**
+
+为了让它正常工作，这个组件内的 `<input>` 必须：
+
+- 将其 `value` attribute 绑定到一个名叫 `value` 的 prop 上
+- 在其 `input` 事件被触发时，将新的值通过自定义的 `input` 事件抛出
+
+
+
+**想想这里的template为什么不可以直接用`v-model`?或者说可以不写任何东西，而在外面直接`v-model`吗？**
+
+TODO
+
+
+
+### 插槽
+
+> 在绑定了Vue之后，html元素就不能随便插值了。但是Vue也提供了方法，插槽来改善这个功能。
+
+
+
+```html
+<alert-box>
+  Something bad happened.
+</alert-box>
+```
+
+```js
+Vue.component('alert-box', {
+  template: `
+    <div class="demo-alert-box">
+      <strong>Error!</strong>
+      <slot></slot>
+    </div>
+  `
+})
+```
+
+
+
+### 动态组件
+
+> TODO
+
+目的就是可以动态地切换不同组件
+
+
+
+```html
+<!-- 组件会在 `currentTabComponent` 改变时改变 -->
+<component v-bind:is="currentTabComponent"></component>
+```
+
+在上述示例中，`currentTabComponent` 可以包括
+
+- 已注册组件的名字，或
+- 一个组件的选项对象
+
+
+
+**补充**
+
+第一次见`<component></component>`这个默认标签，第一次见`is`这个属性。
+
 
 
 # 这就是Vue.js吗
@@ -1142,4 +1474,81 @@ el   |
 data |
 methods|
 computed|
+||
+
+
+
+
+
+## 默认属性
+
+
+
+### `emit`
+
+> [vue.js的emit](https://cn.vuejs.org/v2/api/#vm-emit)
+
+`vm.$emit( eventName, […args\] )`
+
+- 参数
+  - `{string} eventName`
+  - `[...args]`
+
+**作用**
+
+触发当前实例上的事件。附加参数都会传给监听器回调。(就是这个eventName)
+
+可以通过args，传递信息给父组件。**也就是第二个参数是抛出去给父组件的**
+
+
+
+
+
+- 示例
+
+注意:`template`后用的是反引号 **`**
+
+```html
+Vue.component('welcome-button', {
+  template: `
+    <button v-on:click="$emit('welcome')">
+      Click me to be welcomed
+    </button>
+  `
+})
+```
+
+```html
+<div id="emit-example-simple">
+  <welcome-button v-on:welcome="sayHi"></welcome-button>
+</div>
+```
+
+```js
+new Vue({
+  el: '#emit-example-simple',
+  methods: {
+    sayHi: function () {
+      alert('Hi!')
+    }
+  }
+})
+```
+
+运行逻辑:
+
+1. 通过一个`click`事件，去触发`welcome`事件
+2. `welcome`事件，会去调用`sayHi` 函数
+
+
+
+**就感觉自定义一个事件也挺随便的。定义好之后，也需要自己来触发，一般是通过原有的事件来触发你的事件。**
+
+
+
+
+
+
+
+### `event`
 
