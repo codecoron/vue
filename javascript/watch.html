@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
+	<script src="./vue.js"></script>
+	<script src="./coolBtn.js"></script>
+    <title>vue</title>
+</head>
+
+	<style type="text/css">
+		.progress {display: inline-block;background-color: red;width: 0px;height: 18px;}
+		.primary{background-color: #409eff;}
+		.danger{background-color: #f56c6c;}
+		.success{background-color: #67c23a;}
+		.warning{background-color: #e6a23c;}
+	</style>
+
+<body>
+	
+	<div id="app">
+		<h2>{{msg}}({{progressNum}}%)</h2>
+		<span class="progress" :style="spanStyle"></span>
+		<br>
+		<cool-Btn :type="'warning'" :name="'增加进度'" @btn-click='addProgress'></cool-Btn>
+	</div>
+	
+	<script type="text/javascript" >
+		var vue = new Vue({
+			el:'#app',
+			data:{
+				msg:'加油，我看好你哦',
+				progressNum:0,
+				spanStyle:{}
+			},
+			methods:{
+				addProgress:function(){
+					this.progressNum+=10;
+				}
+			},
+			watch:{
+				progressNum:function(val){
+					if(this.progressNum>=100){
+						this.progressNum=100;
+						this.msg='大功告成，辛苦了';
+						return;
+					}
+					var background = 'red';
+					if(this.progressNum>=80){
+						background='green';
+						this.msg='就差一点点了!';						
+					}
+					else if(this.progressNum>=50){
+						background='orange';
+						this.msg='有改善咯'
+					}
+					
+					this.spanStyle = {
+						width:this.progressNum+'px',
+						background:background
+					}
+				}
+			}
+		})
+	</script>
+	
+	<!-- methods不和watch不分离会显得冗余 -->
+	<!-- 把上面的script注释掉，再把下面的script打开，可以对比二者效果 -->
+<!-- 	<script type="text/javascript" >
+		var vue = new Vue({
+		    el:'#app',
+		    data:{
+		        msg:'加油，我看好你哦',
+		        progressNum:0,
+		        spanStyle:{}
+		    },
+		    methods:{
+		        addProgress:function(){
+		            this.progressNum+=10;
+		            if(this.progressNum>=100){
+		                this.progressNum=100;
+		                this.msg='大功告成，辛苦了';
+		                return;
+		            }
+		            var background = 'red';
+		            if(this.progressNum>=80){
+		                background='green';
+		                this.msg='就差一点点了!';						
+		            }
+		            else if(this.progressNum>=50){
+		                background='orange';
+		                this.msg='有改善咯'
+		            }
+		
+		            this.spanStyle = {
+		                width:this.progressNum+'px',
+		                background:background
+		            }
+		        }
+		    }
+		})
+	</script> -->
+</body>
+
+</html>
