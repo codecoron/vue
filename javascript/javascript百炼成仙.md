@@ -522,9 +522,40 @@ methods:{
 
 
 
+**`Filter`过滤器**
 
+**局部过滤器**
 
+直接在Vue对象下添加Filter属性即可，并且使用管道符号`|` 来使用过滤器
+```js
+var vue = new Vue({
+	el:'#app',
+	data:{
+		time:new Date()
+	},
+	filters:{
+		dateFormat:function(val){
+			return val.getFullYear()+'-'+(val.getMonth()+1)+'-'+val.getDate();
+		}
+	}
+})
+```
 
+```html
+		<div id="app">
+			{{time|dateFormat}}
+		</div>
+```
+
+**全局过滤器**
+
+和全局组件用法一样，常用的是输入**名称**和
+
+```js
+Vue.filter('dateFormatB',function(val){
+	return val.getFullYear()+'-'+(val.getMonth()+1)+'-'+val.getDate();
+})
+```
 
 **TODO**
 
