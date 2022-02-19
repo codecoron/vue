@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>filter</title>
+		<!-- <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script> -->
+		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	</head>
+	<body>
+		<div id="app">
+			{{time|dateFormat}}
+		</div>
+		
+		<script type="text/javascript">
+		// Vue.filter('dateFormatB',function(val){
+		// 	return val.getFullYear()+'-'+(val.getMonth()+1)+'-'+val.getDate();
+		// })
+		
+			var vue = new Vue({
+				el:'#app',
+				data:{
+					time:new Date()
+				},
+				filters:{
+					dateFormat:function(val){
+						return val.getFullYear()+'-'+(val.getMonth()+1)+'-'+val.getDate();
+					}
+				}
+			}) 
+		</script>
+	</body>
+</html>

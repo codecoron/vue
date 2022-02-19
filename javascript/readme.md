@@ -565,3 +565,374 @@ Vue.filter('dateFormatB',function(val){
 - [ ] template反引号，template属性单引号，传入单引号，双引号，双引号包含单引号
 - [ ] template双引号，template属性单引号，传入单引号，双引号，双引号包含单引号
 - [ ] template单引号
+
+
+
+# ES6
+
+**`const`的升级**
+const 声明的变量不能改变，如果改变会强制报错
+
+```js
+const NAME1 = '张三'; 
+NAME1 = '李四'; //这里就会直接报错
+console.log(NAME1);
+```
+
+
+
+**解构赋值**
+
+
+
+```js
+let Person = {
+    eat: function () {
+        console.log("我在吃饭!");
+    },
+    sleep: function () {
+        console.log("我在睡觉!");
+    }
+}
+```
+
+
+
+es6之前
+
+```js
+let eat = Person.eat;
+let sleep = Person.sleep;
+eat();
+sleep();
+//可以正确打印
+```
+
+
+
+es6之后
+
+```js
+let { eat, sleep } = Person
+//也可以正确输出
+```
+
+
+
+确实是不太习惯，第一次左边这么多值，右边这么简单
+
+
+
+**es6的解构赋值+默认值**
+
+```js
+let { eat, sleep, name = '这是默认值' } = Person
+```
+
+
+
+**字符串的操作**
+
+这样的`of`你用过吗，按照字符遍历字符串，es6新增
+
+```js
+let str = '我爱你中国'
+for (let s of str) {
+    console.log(s);
+}
+```
+
+
+
+以前的`in`用于获取下标
+
+```js
+for (let n in str) {
+    console.log(n, str[n]);
+}
+```
+
+
+
+
+
+**加强版字符串**,反引号
+
+> 有shell那感觉了
+
+```js
+let name = '张三';
+let sayHi = `你好呀，${name} 一起high`;
+console.log(sayHi);
+```
+
+
+
+可以实现
+
+1. 更方便的实现多行字符串，代码长啥样，打印出来长啥样
+2. 插入表达式，和shell很像
+
+
+
+**`Proxy`代理**
+
+> proxy是一个浏览器支持的全局对象
+
+构造函数时`proxy(target,handler)`，target是一个对象，handler也是一个对象，但是是一个什么了许多操作属性的对象。
+
+
+
+```js
+let obj = {
+    name: 'keke',
+    age: 28
+}
+
+obj.age = "18"
+console.log(obj.age)
+//理论上这里会报错的，但是没有报
+```
+
+
+
+**使用proxy代理，可以这样写代码**
+
+
+
+首先比较惊讶的是这个Proxy的用法，有很多约定俗成的事情。
+
+1. 这样写函数对象，{methodA,methodB}
+2. `set()`的参数会被自动填充,并且return也是要返回`target`，否则不起作用
+3. 在set()中`console.log`可以，但是在`get()`中则不行
+4. `get()`中的receiver是什么?
+
+```js
+let objProxy = new Proxy(obj, {
+    set(target, key, value) {
+        if (key == 'age' && typeof value != 'number')
+            throw new Error(`Invalid attempt to set ${key} to ${value}:not number`)
+        return target[key] = value;
+    },
+    get(target, key, receiver) {
+        return target[key];
+    }
+})
+
+objProxy.age = "28"
+console.log(obj)
+```
+
+
+
+**数组**
+
+原本创建数组的方法
+
+1. 直接`Array`
+2. 使用`Array.of`
+
+```js
+Array.of(7);       // [7]
+Array.of(1, 2, 3); // [1, 2, 3]
+
+Array(7);          // [ , , , , , , ]
+Array(1, 2, 3);    // [1, 2, 3]
+```
+
+**你可以注意到，这里的Array是奇奇怪怪的**
+
+
+
+
+
+**es6**可以使用`Array.from`
+
+可以尽可能地把输入的参数转成**数组**
+
+```js
+let listdata = {
+    0: 'keke',
+    1: 'jerry',
+    length: 2
+}
+console.log(listdata)
+//{ '0': 'keke', '1': 'jerry', length: 2 }
+
+listdata = Array.from(listdata)
+console.log(listdata)
+
+//[ 'keke', 'jerry' ]
+```
+
+
+
+经过测试，这个尽可能是主要需要有以下几个点要求
+
+1. 前面属性值的key要是数字开头，并且要连续(不连续就会导致丢失什么的)
+2. 并且要有length属性(就是根据这个length属性生成数组的大小)
+
+
+
+**`Array.from`的支持回调函数**
+
+```js
+listdata = Array.from(listdata, function (item) {
+    return item + '-----';
+})
+```
+
+看到这里的回调函数，我又想到一些注意点
+
+1. 一定要有个参数，因为机制就是会传个参数给你
+2. 一定要return，因为机制就是原数据等你的返回值，用来赋值
+
+
+
+**`copyWithn`**
+
+> [`copyWithn`](https://www.bookstack.cn/read/es6-3rd/spilt.4.docs-array.md)
+
+将一定范围索引的数组元素修改为此数组另一指定范 围索引的元素。 **会修改当前数组**
+
+```js
+Array.prototype.copyWithin(target, start = 0, end = this.length)
+```
+
+
+
+**`find`**
+
+> [`find`](https://www.bookstack.cn/read/es6-3rd/spilt.5.docs-array.md)
+
+查找数组中符合条件的元素，若有多个符合条件的元素，则 返回第一个元素。**所以参数要求是一个回调函数**
+
+```js
+[1, 4, -5, 10].find((n) => n < 0)
+// -5
+```
+
+ **注意**
+
+它不需要我们返回这个值，只需要我们返回True或者False
+
+
+
+**三个参数的情况**
+
+```js
+[1, 5, 10, 15].find(function(value, index, arr) {
+  return value > 9;
+}) // 10
+```
+
+上面代码中，`find`方法的回调函数可以接受三个参数，依次为当前的值、当前的位置和原数组。
+
+
+
+**两个参数的情况**
+
+```js
+function f(v){
+  return v > this.age;
+}
+let person = {name: 'John', age: 20};
+[10, 12, 26, 15].find(f, person);    // 26
+```
+
+我挺好奇这个person是怎么传给this的
+
+
+
+**我们怎么可以知道，一个方法的全部用法？**而不是要靠一个个的笔记去学习，有没有官方文档?
+
+
+
+·**`fill`**
+
+> [`fill`](https://www.bookstack.cn/read/es6-3rd/spilt.6.docs-array.md)
+
+一个参数，数组全部替换为一个值
+
+```js
+['a', 'b', 'c'].fill(7)
+// [7, 7, 7]
+new Array(3).fill(7)
+// [7, 7, 7]
+```
+
+
+
+三个参数，指定起始和末尾位置
+
+```js
+['a', 'b', 'c'].fill(7, 1, 2)
+// ['a', 7, 'c']
+```
+
+
+
+**还可以填充对象**
+
+```js
+let arr = new Array(3).fill({name: "Mike"});
+arr[0].name = "Ben";
+arr
+// [{name: "Ben"}, {name: "Ben"}, {name: "Ben"}]
+let arr = new Array(3).fill([]);
+arr[0].push(5);
+arr
+// [[5], [5], [5]]
+```
+
+这个例子主要说明了fill一个对象，都是同一个对象的内存值，也就是这是浅拷贝对象，而不是深拷贝对象。
+
+
+
+**`entries`**
+
+> [`entries`](https://www.bookstack.cn/read/es6-3rd/spilt.7.docs-array.md)
+
+```js
+let letter = ['a', 'b', 'c'];
+let entries = letter.entries();
+console.log(entries.next().value); // [0, 'a']
+console.log(entries.next().value); // [1, 'b']
+console.log(entries.next().value); // [2, 'c']
+```
+
+`entries()`可以辅助生成一个链表之类的结构，每个节点是数组，数组由index和value组成，然后就可以用`iterator`去访问。
+
+
+
+
+
+**这样复制数组**
+
+```js
+let newListData = [...listData];
+console.log(newListData)
+```
+
+`...`点点点运算符的作用绝不止这些
+
+
+
+
+
+
+
+**其它**
+
+这么奇葩的代码，真实少见了
+
+```js
+let va = ('haha','jerry')
+console.log(va)
+//输出haha	
+```
+
+没有这种小括号赋值变量的形式
+
+
+
