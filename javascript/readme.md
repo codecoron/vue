@@ -918,7 +918,174 @@ console.log(newListData)
 
 
 
+**函数的强化**
 
+**没想到吧，可以让你省略function关键字**
+
+```js
+let person = {
+    name: 'Tony',
+    getName: function () {
+        return this.name;
+    }
+}
+```
+
+```js
+let personB = {
+    name: 'Tony',
+    getName: () => {
+        return this.name;
+    }
+}
+```
+
+
+
+就是箭头函数可以让你把function省略了，但是作为初学者，不省略也行。
+
+
+
+**只有一个参数，还可以省略括号**，但是不推荐使用
+
+```js
+let sayhi = name => {
+    console.log('你好'+name)
+}
+```
+
+
+
+**甚至你没有参数，把括号也省略掉**
+
+可以用一个下划线来代表一个参数，但是这个参数没有名字，也不能被使用。**我也不推荐写这种东西**
+
+```js
+let sayhi = _ => {
+    console.log('你好')
+}
+```
+
+
+
+**箭头函数与非箭头函数的`this`不一样**
+
+```js
+let person = {
+    name: 'Tony',
+    getName: function () {
+        return this.name;
+    }
+}
+
+let personB = {
+    name: 'Tony',
+    getName: () => {
+        return this.name;
+    }
+}
+
+console.log(person.getName());//Tony
+console.log(personB.getName());//undefined
+```
+
+
+
+
+
+定义函数时的对象
+
+使用函数时的对象
+
+
+
+如果用function定义函数，则里面的this会在代码的实际运行过程中动态绑定，因此指向的就是person对象
+
+箭头函数中this的指向是定义时所在的作用域，而不是执行时的作用域。
+
+```js
+let person = {
+    name: 'tony',
+    getName: () => {
+        console.log(this.name)
+    },
+    sayHi: function () {
+        console.log(this.name)
+    }
+}
+
+person.getName()//定义时的this，也就是windows对象(定义函数时的对象)
+person.sayHi()//会进行动态绑定，也就是person对象(使用函数时的对象)
+```
+
+
+
+**变量声明**
+
+**把函数给变量**
+
+```js
+var a = [];
+for (let i = 0; i < 10; i++) {
+  a[i] = function () {
+    console.log(i);
+  };
+}
+a[6](); // 6
+```
+
+这个数组有十个变量，并且是分别指向了十个函数，而且这十个函数的输出是**不一样的**
+
+
+
+**暂时性死区**(es6)
+
+```js
+var tmp = 123;
+if (true) {
+    tmp = 'abc'; // ReferenceError
+    let tmp;
+}
+```
+
+当你直接运行时，会报`ReferenceError`
+
+如果注释掉`let tmp`则不会报错。
+
+这个代码也许也不一定是完全地从上到下，而是会**分代码块**，来进行变量的绑定。比如这里会在if这个代码块中扫描，发现使用出现在定义之前，所以会报错.
+
+
+
+**全局变量逐步与顶层对象脱钩**
+
+es5
+
+```js
+window.a = 1;
+a // 1
+a = 2;
+window.a // 2
+```
+
+
+
+es6
+
+```js
+var a = 1;
+// 如果在 Node 的 REPL 环境，可以写成 global.a
+// 或者采用通用方法，写成 this.a
+window.a // 1
+
+let b = 1;
+window.b // undefined
+```
+
+
+
+**注意**
+
+这个`Window`顶层对象是在浏览器才有,本地运行的js是没有的
 
 
 
