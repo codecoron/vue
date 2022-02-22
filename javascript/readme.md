@@ -1089,6 +1089,172 @@ window.b // undefined
 
 
 
+**灵活的对象**
+
+**json对象的属性是可以添加单引号、双引号，或者不添加**
+
+```js
+let obj = {"name": 'coderon'}
+let obj = {'name': 'coderon'}
+let obj = {name: 'coderon'}
+```
+
+
+
+**value的值可以引用变量**
+
+我目前还是不建议写这种代码
+
+```js
+let name = '一位神秘的杠精'
+let obj = {
+    name: name
+}
+console.log(obj)
+```
+
+es6允许你写成这样
+
+```js
+let obj = {name}
+```
+
+
+
+**key的值也可以引用变量**
+
+```js
+let key = 'name'
+let obj = {
+    key: 'coderon'
+}
+console.log(obj)//{key:'coderon'}
+```
+
+多加一对中括号表示引用了一个变量
+
+```js
+let key = 'name'
+let obj = {
+    [key]: 'coderon'
+}
+console.log(obj)//{name:'coderon'}
+```
+
+
+
+**`promise`对象和`async`函数**
+
+> 主要完成一些异步操作，因此基本与回调函数离不开
+
+
+
+ `setTimeout()`是一个回调函数
+
+```js
+let gift = null
+setTimeout(() => {
+    gift = 'gift'
+    console.log('我收到了' + gift)
+}, 2000)
+
+console.log("end")
+/**
+end
+我收到了gift
+**/
+```
+
+
+
+`proxy`
+
+```js
+let gift = null
+let obj = { gift }
+let objProxy = new Proxy(obj, {
+    set(target, key, value) {
+        if (key == 'gift') {
+            target[key] = value
+            console.log('我收到' + target[key])
+            return true
+        }
+    },
+    get(target, key) {
+        return target[key]
+    }
+})
+
+setTimeout(() => {
+    objProxy.gift = '竹蜻蜓'
+}, 2000)
+```
+
+
+
+`promise`使用
+
+一般的写法都有resolve,reject两个函数，它们会触发两种不同的操作，`resolve-->then`,`reject-->catch`，分别代表成功与异常，并且在执行对应操作的时候可以传递参数。
+
+**注意**：Promise的参数名字可以随便起，但是第一个肯定是与then绑定的函数，第二个是与catch绑定的函数
+
+```js
+let gift = null
+new Promise((resolve, reject) => {
+    setTimeout(() => {
+        if (Math.random() < 0.2) {
+            gift = '竹蜻蜓'
+            console.log(resolve)
+            resolve(gift)
+        } else {
+            gift = '空空如也'
+            console.log(reject)
+            reject(gift)
+        }
+    }, 100)
+}).then((gift) => {
+    console.log('我收到了' + gift)
+}).catch((gift) => {
+    console.log('我收到了' + gift)
+})
+```
+
+
+
+`async`和`await`
+
+>  getGiftAsync函数返回了一个promise对象，逻辑和刚才一样，然后 在executeAsyncFunc函数的左边加上了async，代表这是一个异步处理函 数。只有加上了async关键字的函数，内部才可以使用await关键字。 async是ES7才提供的与异步操作有关的关键字，async函数执行时，如 果遇到await就会先暂停执行，等到触发的异步操作完成后，才会恢复async函数的执行并返回解析值。
+
+```js
+let getGiftAsync = () => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if (Math.random() < 0.2) {
+                let gift = '竹蜻蜓'
+                resolve(gift)
+            } else {
+                let gift = '空空如也'
+                reject(gift)
+            }
+        }, 2000)
+    })
+}
+
+async function executeAsyncFunc() {
+    let gift = await getGiftAsync();
+    console.log('我收到了' + gift);
+}
+
+executeAsyncFunc();
+console.log('end')
+```
+
+
+
+异步操作这一部分，我能感受到作者想要向我们讲明白异步操作的演进，但是我确实看得一头雾水，唯一让我记住的还是`promise`的使用。
+
+
+
 **其它**
 
 这么奇葩的代码，真实少见了
