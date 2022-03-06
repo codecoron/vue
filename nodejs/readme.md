@@ -1,4 +1,4 @@
-# node.js
+**node.js**
 
 > 基于《Node.js+Webpack开发实战》和Nodejs官网学习nodejs
 
@@ -27,9 +27,9 @@ server.listen(port, hostname, () => {
 2. 导入一个模块的对象、函数等，可以使用`require`，或者后续的`import`
 3. 获取到`http`对象后，创建了一个服务器`server`，顺理成章地监听ip:port
 
-## **模块系统**
+# **模块系统**
 
-### `export`
+## `export`
 
 下面两段代码就展示了`exports`的作用，通过exports就可以把一个文件的变量、函数导出
 ```js
@@ -49,7 +49,7 @@ console.log(sum(1, 2))
 
 
 
-### **`exports`和`module.exports`**
+## **`exports`和`module.exports`**
 
 其实`exports`是一个变量，是`module`的一个属性
 ```js
@@ -92,7 +92,7 @@ var exports = module.exports
 
 
 
-## **`nodejs`的异步编程**
+# **`nodejs`的异步编程**
 
 书上说这个算使用了回调函数，但是不算异步编程(**我也不清楚**)
 ```js
@@ -142,7 +142,7 @@ func(param..., callback(Error, data))
 
 
 
-### **`Promise`**
+## **`Promise`**
 
 这个函数签名有需要注意，它可以用来new，并且会返回promise对象之类的东西
 ```js
@@ -283,7 +283,7 @@ readFileAsync('./README.md')
 
 
 
-### **`async/await`**
+## **`async/await`**
 
 > 本质上是promise的语法糖，可以让写异步的代码像同步一样，但是我还是**没有真正搞懂异步**
 
@@ -355,7 +355,7 @@ getData();
 
 
 
-### 事件
+## 事件
 
 触发事件
 
@@ -480,3 +480,310 @@ server.listen(8080, () => {
 })
 ```
 
+# `express`
+
+快速尝试了一下`express`框架，发现与直接使用`http`的相同与不同
+
+1. 相同的：在require之后，都需要再创建一个Server。比如`express()`和`http.createServer((req, resp)`
+2. 传统http很难设置不同的访问路径。而express可以直接通过方法设置
+3. 传统的http需要**主动使用**`resp.end()`才会返回数据，`express`则直接解析一下便会顺便返回调用`end()`返回数据.
+
+**注意**:
+这里发现了`req.headers`和`req.header`的不同，`headers`是属性，`header`是一个函数。
+
+```js
+// 导入express 模块
+const express = require('express')
+// 创建应用
+const app = express();
+
+// 设置路由
+app.get('/', (req, resp) => {
+    resp.json(req.headers)
+    // console.log(req.header)
+    console.log(req.headers)
+});
+
+app.listen(8080, () => {
+    console.log('listen on 8080')
+})
+```
+
+## `express`路由
+
+路由的函数的统一写法`app.METHOD(PATH, HANDLER)`
+
+如果你希望使用一个函数处理一个路径的所有请求，那么可以使用`app.all()`
+
+**路由参数**
+> 主要说一下,get方法中的参数如何传递
+
+1. 需要使用占位符这样的东西，**冒号+键**
+2. 然后key与value会以json的格式被存到`req.params`中
+
+```js
+app.get('/users/:userId/timelines/:timelineId', (req, resp) => {
+    resp.json(req.params);
+});
+```
+还可以给`key`加一些正则表达式匹配，注意一下规则，括号以及双斜杠(我也不知道为什么是双斜杠)
+
+```js
+app.get('/users/:userId(\\d+)/timelines/:timelineId(\\d+)', (req, resp) => {
+    resp.json(req.params);
+});
+```
+
+**路由函数**
+
+```js
+function(request, response, next)
+```
+
+多个路由函数，需要在前一个函数的内部调用`next()`，并且`req`和`resp`会自动传给`next()`
+
+```js
+app.get('/', (req, resp, next) => {
+    console.log(`${req.method} ${req.path}`);
+    next();
+}, (req, resp) => {
+    resp.send('首页');
+});
+```
+
+感觉next不常用
+
+**函数数组**
+
+还真没见过，而且居然能够自动解析
+```js
+function logger(req, resp, next) {
+    console.log(`${req.method} ${req.path}`);
+    next();
+}
+function home(req, resp) {
+    resp.send('首页');
+}
+// 设置路由
+app.get('/', [logger, home]);
+```
+
+
+**公共路由路径**
+
+感觉差别不大，会少写一点代码吧。
+
+```js
+app.get('/user/login', (req, resp) => {
+    resp.send('登录页面');
+});
+app.post('/user/login', (req, resp) => {
+    resp.send('登录处理');
+});
+```
+
+```js
+app.route('/user/login')
+    .get((req, resp) => {
+        resp.send('登录页面')
+    })
+    .post((req, resp) => {
+        resp.send('登录处理')
+    })
+```
+
+**模块化的路由**
+
+关键是可以把路由规则当作一个对象给导出来
+
+```js
+// user.js
+const express = require('express');
+const router = express.Router();
+router.get('/login', (req, resp) => {
+    resp.send('登录');
+});
+router.get('/register', (req, resp) => {
+    resp.send('注册');
+});
+// 导出路由对象
+module.exports = router;
+```
+```js
+// timeline.js
+const express = require('express')
+const router = express.Router();
+
+router.get('/list', (req, resp) => {
+    resp.send('动态列表')
+});
+
+module.exports = router
+```
+
+```js
+// index.js
+const express = require('express')
+const app = express()
+
+const user = require('./user')
+const timeline = require('./timeline')
+
+app.use('/user', user);
+app.use('./timelin', timeline);
+
+app.listen(8080, () => {
+    console.log('listen on 8080')
+})
+```
+
+**`req`的属性与方法**
+
+属性名 | 说明 | 备注
+------|------|-----
+method | 请求方法 | 
+path | 请求路径
+url | 请求url
+query | GET参数对象 | 与params有啥不同??
+params | 路由参数对象
+headers | 请求报头 
+cookies | 请求cookie | 需要使用cookie-parser插件
+ip | 客户端ip
+body | post请求数据 | 需要使用body-parser插件
+
+```js
+// npm install body-parser –save
+// 导入express模块
+const express = require('express');
+const bodyParser = require('body-parser');
+const app = express();
+
+//解析 body 
+// 这是新版使用bodyParser的方法
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+
+
+app.post('/', (req, resp) => {
+    resp.json(req.body);
+});
+// 开启监听
+app.listen(8080, () => {
+    console.log('listen on 8080');
+})
+
+```
+
+**`resp`的属性与方法**
+
+函数 | 作用 | 备注
+-----|------|----
+`resp.send()` | 发送文本 |
+`resp.status(statusCode);` | 设置响应码
+`resp.set(field[, value])` <br>  `resp.set({ [field]: value })`| 设置响应报头 
+`resp.end([chunk][, encoding][, callback])` | 结束响应过程
+
+
+## 中间件
+
+**全局中间件**
+
+看了下面代码之后，有些惊奇和疑问
+
+1. 中间件居然可以是个函数
+2. `app.use()`还可以加函数
+3. `app.use()`是怎么知道`logger`需要什么参数? (感觉是默认潜规则)
+
+```js
+const express = require('express')
+const app = express()
+
+function logger(req, resp, next) {
+    console.log(`${req.method} ${req.path} "${req.headers['user-agent']}"`)
+    next()
+}
+
+app.use(logger)
+app.get('/', (req, resp) => {
+    resp.send('hello world')
+})
+app.get('/user', (req, resp) => {
+    resp.send('user')
+})
+
+app.listen(8080, () => {
+    console.log('listen on 8080')
+})
+```
+
+**路由中间件**
+
+原来`app.get()`还可以接受这个参数
+
+```js
+// app.use(logger)
+app.get('/',logger,(req,resp)=>{
+    resp.send('hello world')
+})
+
+// 未使用中间件
+app.get('/user',(req,resp)=>{
+    resp.send('user')
+})
+```
+
+**可配置的中间件**
+
+为什么这两种有这两种的差别呢，直接写函数名不写括号，就会自动填上参数。写了括号，就不会自动填充参数
+```js
+app.use(cookieParser());
+
+app.use(logger);
+```
+
+这是`cookieParser`的函数大概结构，这样就实现可以传参进来，然后又返回真正有`req resp next`的函数
+```js
+function cookieParser(options) {
+    return function (req, resp, next) {
+    };
+}
+```
+这样写的中间件可以配置
+```js
+const express = require('express')
+const app = express()
+
+function logger(options) {
+    return function (req, resp, next) {
+        const logs = [];
+        if (options.method)
+            logs.push(req.method)
+        if (options.path)
+            logs.push(req.path)
+        if (options['user-agent'])
+            logs.push(req.headers['user-agent'])
+        console.log(logs.join(' '))
+        next();
+    }
+}
+
+app.use(logger({ method: true, path: true }))//使用中间件，并传入配置
+app.get('/', (req, resp) => {
+    resp.send('hello world')
+})
+
+// 未使用中间件
+app.get('/user', (req, resp) => {
+    resp.send('user')
+})
+
+app.listen(8080, () => {
+    console.log('listen on 8080')
+})
+
+```
+
+## **`app`的属性与函数**
+> 也就是 `express()`
