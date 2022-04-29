@@ -81,3 +81,33 @@ http://localhost:3000/posts/?author=author
 
 
 json-server支持配置，可以把数据写进`json-server.json`，本质上是把json-server选项的数据写进`json-server.json`
+
+```shell
+json-server --watch db.json # 如果有json-server.json在同当前目录有没有json-server.json 
+
+json-server --watch ./db/db.json # 同理也是会去读取当前目录有没有json-server.json 
+
+所以重点都是当前目录
+```
+
+
+## 其它
+
+**json-server**首页访问不了
+
+1. 通常我们执行  `json-server --watch ./db.json`
+
+访问`http://localhost:3000` 会跳到`json-server`的首页
+
+2. 但是如果我们执行 `json-server --watch ./db/db.json`(就是在执行命令时，不在db.json所在的目录)
+
+这时候访问`http://localhost:3000` **就找不到**json-server的首页
+
+3. 当我们执行`json-server --watch ./db.json` 
+
+但是，db.json的目录下，有其它目录存在时，也是访问不了`json-server`首页
+```shell
+--- public/
+--- db.json
+```
+
