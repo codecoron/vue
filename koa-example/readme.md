@@ -99,3 +99,17 @@ const router = new Router({ prefix: '/user' });
 
 暂时跳过
 
+## 微博小项目
+
+在`koa-example/weibo/`中
+
+
+这个微博小项目实现了什么功能，我是如何在postman中测试的
+```shell
+GET localhost:10000 # 返回文章列表
+GET http://localhost:10000/publish # 原本如果有界面的话，可以在这里填写要发表的内容，但是没有界面，这里将会返回一句话「在这里可以发布你的微博 title=title content=content」
+POST http://localhost:10000/publish # header选择application/json  Body选择raw 然后输入title和content 返回json
+GET http://localhost:10000/post/:postId # 获取某个postid的文章
+POST http://localhost:10000/update/postId # 更新某个postid的文章 可以在body定义新的content等
+POST http://localhost:10000/delete/postId # 删除某个postid的文章
+```
