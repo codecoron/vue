@@ -15,3 +15,9 @@
     routes, // `routes: routes` 的缩写
   })
 ```
+
+这里创建的实例，和`nodejs`很像，虽然它不是常写的，通过new来生成一个`Vue`对象，但它本质上还是一个`Vue`对象。
+```js
+// 5. 创建并挂载根实例
+const app = Vue.createApp({})
+```
