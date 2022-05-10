@@ -1,0 +1,10 @@
+{
+  "name": "vuex",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "vue": "^3.2.33",
+    "vuex": "^4.0.2"
+  }
+}

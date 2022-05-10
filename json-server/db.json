@@ -1,0 +1,31 @@
+{
+  "posts": [
+    {
+      "id": 1,
+      "title": "json-server",
+      "author": "typicode"
+    },
+    {
+      "title": "title4",
+      "author": "author4",
+      "id": 3
+    },
+    {
+      "name": "weibo",
+      "author": "authorA",
+      "time": "2022-04-29",
+      "id": 4
+    }
+  ],
+  "comments": [
+    {
+      "id": 1,
+      "body": "some comment",
+      "postId": 1
+    }
+  ],
+  "profile": {
+    "name": "typicode",
+    "author": "author"
+  }
+}
