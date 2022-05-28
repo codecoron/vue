@@ -8,6 +8,8 @@
 
 但是我比较疑惑的是，这个use的作用是什么?
 
+
+**一个函数也可以作为一个中间件**
 ```js
 // 导入模块
 const koa = require('koa')
@@ -63,6 +65,23 @@ async function middleware2(ctx, next) {
     await next();
     console.log('middlware2 end')
 }
+```
+
+**这个例子证明了`async`和`await`的作用**
+
+但是为什么去掉`async`或者`await`就不行呢？
+```js
+const fs = require('fs.promised');
+const Koa = require('koa');
+const app = new Koa();
+
+const main = async function (ctx, next) {
+  ctx.response.type = 'html';
+  ctx.response.body = await fs.readFile('./demos/template.html', 'utf8');
+};
+
+app.use(main);
+app.listen(3000);
 ```
 
 ## `router`
